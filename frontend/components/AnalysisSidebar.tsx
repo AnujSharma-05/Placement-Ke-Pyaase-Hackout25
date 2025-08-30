@@ -4,15 +4,23 @@ import { InfrastructureType, AnalysisResult } from '../types';
 import DataLayersPanel from './DataLayersPanel';
 import SlidersPanel from './SlidersPanel';
 import ResultsPanel from './ResultsPanel';
+import FeasibilityPanel from './FeasibilityPanel';
 
 interface AnalysisSidebarProps {
   visibleLayers: { [key in InfrastructureType]?: boolean };
   onLayerToggle: (layer: InfrastructureType) => void;
-  pinpoint: L.LatLng | null;
+  pinpoint: { lat: number; lng: number } | null;
   sliderValues: { power: number; market: number; logistics: number };
+  numResults: number;
   onSliderChange: (sliderName: string, value: number) => void;
+  onNumResultsChange: (value: number) => void;
+  onOptimizeGrid: () => void;
+  isLoading: boolean;
   results: AnalysisResult[];
   onResultClick: (coords: L.LatLngTuple) => void;
+  // New props for feasibility analysis
+  feasibilityResult?: any;
+  isFeasibilityLoading?: boolean;
 }
 
 const AnalysisSidebar: React.FC<AnalysisSidebarProps> = (props) => {
@@ -27,12 +35,22 @@ const AnalysisSidebar: React.FC<AnalysisSidebarProps> = (props) => {
         <SlidersPanel
             pinpoint={props.pinpoint}
             sliderValues={props.sliderValues}
+            numResults={props.numResults}
             onSliderChange={props.onSliderChange}
+            onNumResultsChange={props.onNumResultsChange}
+            onOptimizeGrid={props.onOptimizeGrid}
+            isLoading={props.isLoading}
         />
 
         <ResultsPanel
             results={props.results}
             onResultClick={props.onResultClick}
+        />
+
+        <FeasibilityPanel
+            result={props.feasibilityResult}
+            isLoading={props.isFeasibilityLoading || false}
+            pinpoint={props.pinpoint}
         />
       </div>
     </aside>

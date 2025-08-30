@@ -1,3 +1,17 @@
+/**
+ * Sends weights and numResults to get top N optimized grid locations.
+ */
+export const optimizeGrid = async (weights, numResults = 5) => {
+    const response = await fetch(`${BASE_URL}/optimize-grid`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ weights, numResults }),
+    });
+    if (!response.ok) {
+        throw new Error('Failed to get grid optimization results');
+    }
+    return response.json();
+};
 // The base URL of your Flask backend
 const BASE_URL = 'http://127.0.0.1:5000/api';
 // const BASE_URL = ''
