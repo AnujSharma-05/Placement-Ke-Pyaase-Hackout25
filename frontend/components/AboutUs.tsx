@@ -3,11 +3,10 @@ import React from 'react';
 import Navbar from './Navbar';
 
 interface AboutUsProps {
-  onNavigate: (page: 'landing' | 'dashboard' | 'about') => void;
   onLogout: () => void;
 }
 
-const AboutUs: React.FC<AboutUsProps> = ({ onNavigate, onLogout }) => {
+const AboutUs: React.FC<AboutUsProps> = ({ onLogout }) => {
   return (
     <div className="relative w-full h-full bg-gray-950 text-gray-50 flex flex-col">
       <div 
@@ -18,7 +17,7 @@ const AboutUs: React.FC<AboutUsProps> = ({ onNavigate, onLogout }) => {
         }}
       />
       
-      <Navbar onNavigate={onNavigate} onLogout={onLogout} currentPage="about" />
+      <Navbar onLogout={onLogout} />
       
       <main className="flex-1 flex items-center justify-center z-10">
         <div className="container mx-auto px-6 py-24 text-center max-w-4xl">
