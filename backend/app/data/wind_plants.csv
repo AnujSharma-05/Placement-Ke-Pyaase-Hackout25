@@ -1,0 +1,22 @@
+Sl. No.,State,District,Area (sq. km) available,Average Wind Speed (m/s),Installable Potential (MW) (assuming 5 MW / sq.km)
+1,Tamil Nadu,Tirunelveli,68,7.326,340
+2,Tamil Nadu,Tuticorin,169,6.998,845
+3,Tamil Nadu,Coimbatore & partially Palakkad (Kerala),351,8.588,1755
+4,Tamil Nadu,Tiruchirappalli & Perambalur,547,7.093,2735
+5,Karnataka,Tumakuru,530,7.307,2650
+6,Karnataka,Chitradurga & Davangere,640,7.132,3200
+7,Karnataka,Bellary & Davangere,924,7.139,4620
+8,Karnataka,Chitradurga,269,7.153,1345
+9,Karnataka,Chitradurga & Davangere,380,7.194,1900
+10,Gujarat,Junagadh & Porbandar,2900,7.017,14500
+11,Gujarat,Kutch,771,7.329,3855
+12,Gujarat,Kutch,680,7.51,3400
+13,Gujarat,Kutch,590,7.434,2950
+14,Gujarat,Kutch,308,7.297,1540
+15,Rajasthan,Barmer,265,6.5,1325
+16,Rajasthan,Barmer,109,6.52,545
+17,Madhya Pradesh,West Nimar,220,6.91,1100
+18,Telangana,Ranga Reddy,346,7.14,1730
+19,Telangana,Ranga Reddy,197,6.61,985
+20,Andhra Pradesh,Anantapur,361,7.13,1805
+Total (MW),Total (MW),Total (MW),10625,143.327,53125

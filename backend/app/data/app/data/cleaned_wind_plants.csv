@@ -1,0 +1,21 @@
+Sl. No.,State,District,Area (sq. km) available,Average Wind Speed (m/s),Installable Potential (MW) (assuming 5 MW / sq.km),latitude,longitude
+1,Tamil Nadu,Tirunelveli,68,7.326,340,8.5495014,77.5805178
+2,Tamil Nadu,Tuticorin,169,6.998,845,8.8052602,78.1452745
+3,Tamil Nadu,Coimbatore & partially Palakkad (Kerala),351,8.588,1755, 10.814553, 76.657884
+4,Tamil Nadu,Tiruchirappalli & Perambalur,547,7.093,2735,10.821229, 78.715116
+5,Karnataka,Tumakuru,530,7.307,2650,13.4192512,76.8810004
+6,Karnataka,Chitradurga & Davangere,640,7.132,3200,14.209411, 76.395613
+7,Karnataka,Bellary & Davangere,924,7.139,4620,14.4609878,75.9244844
+8,Karnataka,Chitradurga,269,7.153,1345,14.3049174,76.5296667
+9,Karnataka,Chitradurga & Davangere,380,7.194,1900,14.213508, 76.387512
+10,Gujarat,Junagadh & Porbandar,2900,7.017,14500,21.631758, 69.663255
+11,Gujarat,Kutch,771,7.329,3855,23.583333,70.0
+12,Gujarat,Kutch,680,7.51,3400,23.583333,70.0
+13,Gujarat,Kutch,590,7.434,2950,23.583333,70.0
+14,Gujarat,Kutch,308,7.297,1540,23.583333,70.0
+15,Rajasthan,Barmer,265,6.5,1325,25.5814853,71.1924922
+16,Rajasthan,Barmer,109,6.52,545,25.5814853,71.1924925
+17,Madhya Pradesh,West Nimar,220,6.91,1100,21.853693, 75.527312
+18,Telangana,Ranga Reddy,346,7.14,1730,17.1333954,78.3970979
+19,Telangana,Ranga Reddy,197,6.61,985,17.1333954,78.3970979
+20,Andhra Pradesh,Anantapur,361,7.13,1805,14.72422,77.4306738
