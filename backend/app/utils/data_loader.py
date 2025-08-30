@@ -5,9 +5,8 @@ import os
 
 # _BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # DATA_DIR = os.path.join(_BASE_DIR, '..', 'data')
-# DATA_DIR = r'C:\\MeetJain\\Hackathons\\hackout\\Placement-Ke-Pyaase-Hackout25\\backend\\app\\data\\app\\data'
-_BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(_BASE_DIR, '..', 'data', 'app', 'data')
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(BASE_DIR, '..','data','app','data')
 
 def load_all_data():
     """

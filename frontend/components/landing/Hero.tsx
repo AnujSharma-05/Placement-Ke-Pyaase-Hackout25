@@ -2,7 +2,11 @@ import React from "react";
 import { ArrowDown, Atom } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const Hero = () => {
+interface HeroProps {
+  onExploreMap: () => void;
+}
+
+const Hero: React.FC<HeroProps> = ({ onExploreMap }) => {
   const navigate = useNavigate();
   return (
     <section className="relative min-h-screen bg-black text-white overflow-hidden">
@@ -80,7 +84,14 @@ const Hero = () => {
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <button
-                  onClick={() => navigate("/dashboard")}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (onExploreMap) {
+                      onExploreMap();
+                    } else {
+                      navigate("/dashboard");
+                    }
+                  }}
                   className="group px-8 py-4 bg-emerald-400 text-black font-bold rounded-none hover:bg-emerald-300 transition-all duration-300 flex items-center justify-center gap-2"
                 >
                   <span>EXPLORE MAP</span>
