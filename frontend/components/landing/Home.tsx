@@ -8,10 +8,14 @@ import Mission from "./Mission";
 import CTA from "./CTA";
 import Footer from "./Footer";
 
-const Home: React.FC = () => {
+interface HomeProps {
+  onNavigateDashboard?: () => void;
+}
+
+const Home: React.FC<HomeProps> = ({ onNavigateDashboard }) => {
   return (
     <div className="min-h-screen bg-white">
-      <Hero />
+      <Hero onExploreMap={onNavigateDashboard} />
       <Problem />
       <Solution />
       <MapPreview />
