@@ -5,7 +5,9 @@ import os
 
 # _BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # DATA_DIR = os.path.join(_BASE_DIR, '..', 'data')
-DATA_DIR = r'C:\\MeetJain\\Hackathons\\hackout\\Placement-Ke-Pyaase-Hackout25\\backend\\app\\data\\app\\data'
+# DATA_DIR = r'C:\\MeetJain\\Hackathons\\hackout\\Placement-Ke-Pyaase-Hackout25\\backend\\app\\data\\app\\data'
+_BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(_BASE_DIR, '..', 'data', 'app', 'data')
 
 def load_all_data():
     """
@@ -55,7 +57,7 @@ def load_all_data():
         # Convert capacity to numeric, coercing errors
         renewable_plants_df['capacity_mw'] = pd.to_numeric(renewable_plants_df['capacity_mw'], errors='coerce')
         
-        print(f"Data Loaded: {len(renewable_plants_df)} renewable plants and {len(demand_df)} demand centers.")
+        # print(f"Data Loaded: {len(renewable_plants_df)} renewable plants and {len(demand_df)} demand centers.")
 
         return renewable_plants_df, demand_df, logistics_df
 
