@@ -1,61 +1,30 @@
 import React, { useState, useCallback } from "react";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import Home from "./components/landing/Home";
 import Dashboard from "./components/Dashboard";
 import AboutUs from "./components/AboutUs";
 
-type Page = "landing" | "dashboard" | "about";
-
 const AppContent: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [currentPage, setCurrentPage] = useState<Page>("landing");
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogin = useCallback(() => {
     setIsAuthenticated(true);
-    setCurrentPage("dashboard");
-  }, []);
+    navigate("/dashboard");
+  }, [navigate]);
 
   const handleLogout = useCallback(() => {
     setIsAuthenticated(false);
-    setCurrentPage("landing");
-  }, []);
+    navigate("/");
+  }, [navigate]);
 
-  const navigate = useCallback((page: Page) => {
+  const navigateToPage = useCallback((page: string) => {
     console.log("Navigating to:", page);
-    setCurrentPage(page);
-  }, []);
+    navigate(page);
+  }, [navigate]);
 
-  const renderPage = () => {
-    switch (currentPage) {
-      case "dashboard":
-        return isAuthenticated ? (
-          <Dashboard onLogout={handleLogout} onNavigate={navigate} />
-        ) : (
-          <Home
-            onNavigateDashboard={() => {
-              console.log("Navigating to dashboard from Home component");
-              setIsAuthenticated(true);
-              setCurrentPage("dashboard");
-            }}
-          />
-        );
-      case "about":
-        return <AboutUs onNavigate={navigate} onLogout={handleLogout} />;
-      case "landing":
-      default:
-        return (
-          <Home
-            onNavigateDashboard={() => {
-              console.log("Navigating to dashboard from Home component");
-              setIsAuthenticated(true);
-              setCurrentPage("dashboard");
-            }}
-          />
-        );
-    }
-  };
-
-  const isLandingPage = currentPage === "landing";
+  const isLandingPage = location.pathname === "/";
 
   return (
     <div
@@ -63,7 +32,46 @@ const AppContent: React.FC = () => {
         isLandingPage ? "overflow-y-auto" : "overflow-hidden"
       }`}
     >
-      {renderPage()}
+      <Routes>
+        <Route 
+          path="/" 
+          element={
+            <Home
+              onNavigateDashboard={() => {
+                console.log("Navigating to dashboard from Home component");
+                setIsAuthenticated(true);
+                navigate("/dashboard");
+              }}
+            />
+          } 
+        />
+        <Route 
+          path="/dashboard" 
+          element={
+            isAuthenticated ? (
+              <Dashboard 
+                onLogout={handleLogout}
+              />
+            ) : (
+              <Home
+                onNavigateDashboard={() => {
+                  console.log("Navigating to dashboard from Home component");
+                  setIsAuthenticated(true);
+                  navigate("/dashboard");
+                }}
+              />
+            )
+          } 
+        />
+        <Route 
+          path="/about" 
+          element={
+            <AboutUs 
+              onLogout={handleLogout} 
+            />
+          } 
+        />
+      </Routes>
     </div>
   );
 };

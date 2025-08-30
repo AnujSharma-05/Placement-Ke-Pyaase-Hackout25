@@ -56,7 +56,7 @@ def load_all_data():
         # Convert capacity to numeric, coercing errors
         renewable_plants_df['capacity_mw'] = pd.to_numeric(renewable_plants_df['capacity_mw'], errors='coerce')
         
-        print(f"Data Loaded: {len(renewable_plants_df)} renewable plants and {len(demand_df)} demand centers.")
+        # print(f"Data Loaded: {len(renewable_plants_df)} renewable plants and {len(demand_df)} demand centers.")
 
         return renewable_plants_df, demand_df, logistics_df
 
