@@ -7,6 +7,10 @@ import pandas as pd
 
 from ..services.reasoning_agent import get_reasoning_for_data
 
+from ..services.optimization_service import analyze_power_supply_for_coordinate
+from ..services.reasoning_agent import get_reasoning_for_power_supply
+
+
 @api_bp.route('/optimize', methods=['POST'])
 def get_optimization_score():
     """
@@ -176,3 +180,41 @@ def analyze_reasoning():
     except Exception as e:
         # It's good practice to log the error, e.g., print(e) or use a logger
         return jsonify({"error": "Failed to generate reasoning.", "details": str(e)}), 500
+    
+
+@api_bp.route('/analyze-power-supply', methods=['POST'])
+def analyze_power_supply():
+    """
+    Analyzes power supply for a coordinate based on required capacity
+    and returns both the data and an AI-powered reasoning.
+    """
+    data = request.get_json()
+    if not data or 'coordinate' not in data or 'requiredCapacity' not in data:
+        return jsonify({"error": "Missing 'coordinate' or 'requiredCapacity' in request body"}), 400
+
+    try:
+        coordinate = data['coordinate']
+        required_capacity = data['requiredCapacity']
+        
+        # Load the data
+        renewable_df, _, _ = load_all_data()
+
+        # Step 1: Get the quantitative analysis
+        power_analysis = analyze_power_supply_for_coordinate(
+            user_lat=coordinate['latitude'],
+            user_lon=coordinate['longitude'],
+            required_capacity_mw=required_capacity,
+            renewable_df=renewable_df
+        )
+
+        # Step 2: Get the qualitative reasoning from the AI agent
+        reasoning_text = get_reasoning_for_power_supply(power_analysis)
+
+        # Step 3: Combine and return
+        return jsonify({
+            "analysis": power_analysis,
+            "reasoning": reasoning_text
+        })
+
+    except Exception as e:
+        return jsonify({"error": "Failed to perform power supply analysis", "details": str(e)}), 500

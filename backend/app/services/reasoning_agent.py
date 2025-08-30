@@ -86,3 +86,35 @@ def get_reasoning_for_data(weights, scores_data):
     print(gemini_api_key)
     result = crew.kickoff()
     return result.raw
+
+
+def get_reasoning_for_power_supply(power_analysis_data):
+    """
+    Uses the CrewAI agent to generate reasoning based on a detailed power supply analysis.
+    """
+    # Create a more detailed, readable summary of the nearest plants
+    plants_summary = "\n".join([
+        f"- A {plant['type']} source in {plant['State']} with {plant['capacity_mw']} MW capacity is {plant['distance_km']} km away."
+        for plant in power_analysis_data.get("nearest_plants", [])
+    ])
+
+    task_description = (
+        f"Analyze the green power supply for a potential hydrogen project. "
+        f"The project requires {power_analysis_data.get('required_capacity_mw')} MW of power. "
+        f"Our analysis found a total of {power_analysis_data.get('total_available_capacity_mw')} MW available from the nearest plants, resulting in a 'Supply Score' of {power_analysis_data.get('supply_score')}/10. "
+        f"The key nearby power sources are:\n{plants_summary}\n\n"
+        f"Based on this data, provide a 2-3 sentence analysis. "
+        f"Does the available capacity meet the project's requirements? "
+        f"Comment on the strength of the power supply. Is it abundant, sufficient, or insufficient? "
+        f"Mention the proximity of the plants as a key factor."
+    )
+
+    analysis_task = Task(
+        description=task_description,
+        expected_output="A short, insightful paragraph analyzing the power supply adequacy for the project, referencing the required vs. available capacity.",
+        agent=analyst_agent
+    )
+
+    crew = Crew(agents=[analyst_agent], tasks=[analysis_task], verbose=True)
+    result = crew.kickoff()
+    return result.raw
