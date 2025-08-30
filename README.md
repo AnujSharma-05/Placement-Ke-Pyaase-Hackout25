@@ -7,22 +7,26 @@
 ![UI Dashboard](ui_dashboard.jpg)
 
 ## Project Description
+
 A comprehensive supply chain optimization and feasibility analysis system for green hydrogen project placement in India. This platform helps investors, policymakers, and energy companies identify optimal locations for green hydrogen production facilities by analyzing proximity to renewable energy sources, market demand centers, and logistics infrastructure.
 
 ## Features and Functionality
 
 ### Core Optimization Engine
+
 - **Grid-based Analysis**: Evaluates locations across India using a comprehensive grid system
 - **Multi-criteria Decision Making**: Considers power proximity, market access, and logistics infrastructure
 - **Weighted Scoring System**: Users can customize importance weights for different factors
 - **Real-time Feasibility Assessment**: Provides immediate scoring for any geographic coordinate
 
 ### AI-Powered Insights
+
 - **Intelligent Reasoning**: AI agent explains feasibility scores in natural language
 - **Data-driven Recommendations**: Provides actionable insights based on optimization results
 - **Customizable Analysis**: Adapts explanations based on user priorities and weights
 
 ### Interactive API
+
 - **RESTful Endpoints**: Comprehensive API for frontend integration
 - **GeoJSON Support**: Returns data in standardized geographic formats
 - **Error Handling**: Robust error management and validation
@@ -30,19 +34,23 @@ A comprehensive supply chain optimization and feasibility analysis system for gr
 ## Technologies and Libraries Used
 
 ### Backend Framework
+
 - **Flask**: Python web framework for API development
 - **Flask-CORS**: Cross-origin resource sharing support
 
 ### Data Processing & Analysis
+
 - **Pandas**: Data manipulation and analysis
 - **NumPy**: Numerical computing and array operations
 - **Scikit-learn**: Machine learning utilities (Haversine distance calculations)
 
 ### AI & Reasoning
+
 - **CrewAI**: Multi-agent framework for AI reasoning
 - **Google Gemini**: Large language model for natural language explanations
 
 ### Optimization & Mathematics
+
 - **SciPy**: Scientific computing and optimization algorithms
 - **Linear Programming**: For supply route optimization
 
@@ -77,11 +85,13 @@ Placement-Ke-Pyaase-Hackout25/
 ## Setup and Running Instructions
 
 ### Prerequisites
+
 - Python 3.8+
 - pip (Python package manager)
 - Google Gemini API key (for AI reasoning)
 
 ### Installation
+
 1. Clone the repository
 2. Navigate to the backend directory:
    ```bash
@@ -97,6 +107,7 @@ Placement-Ke-Pyaase-Hackout25/
    ```
 
 ### Running the Application
+
 ```bash
 python run.py
 ```
@@ -104,7 +115,9 @@ python run.py
 The application will start on `http://0.0.0.0:5000`
 
 ### Testing
+
 Run the test script to verify functionality:
+
 ```bash
 python test_script.py
 ```
@@ -112,18 +125,21 @@ python test_script.py
 ## Data Sources and Preprocessing
 
 ### Primary Data Sources
+
 - **Renewable Energy Plants**: Solar and wind power installations across India
 - **Demand Centers**: Industrial and commercial zones with hydrogen demand potential
 - **Logistics Hubs**: Ports and transportation infrastructure
 - **SEZ Data**: Special Economic Zones for industrial development
 
 ### Data Processing Pipeline
+
 1. **Data Cleaning**: Removal of incomplete records and standardization
 2. **Geocoding**: Conversion of location data to latitude/longitude coordinates
 3. **Capacity Normalization**: Standardization of power capacity measurements
 4. **Quality Assurance**: Validation of geographic coordinates and data integrity
 
 ### Preprocessed Files
+
 - `cleaned_solar_plants.csv`: Processed solar power plant data
 - `cleaned_wind_plants.csv`: Processed wind power plant data
 - `cleaned_demand_centers.csv`: Processed demand center locations
@@ -134,9 +150,11 @@ python test_script.py
 ### Optimization Endpoints
 
 #### POST `/api/optimize`
+
 Calculates opportunity scores for new hydrogen projects with custom weights.
 
 **Request Body:**
+
 ```json
 {
   "powerWeight": 0.25,
@@ -147,26 +165,32 @@ Calculates opportunity scores for new hydrogen projects with custom weights.
 ```
 
 #### GET `/api/initial-map-data`
+
 Returns all initial data points for map visualization in GeoJSON format.
 
 #### POST `/api/optimize-grid`
+
 Grid-based optimization returning top N locations based on user weights.
 
 #### POST `/api/optimize-point`
+
 Calculates feasibility score for a single user-defined coordinate.
 
 #### POST `/api/analyze-reasoning`
+
 Generates AI-powered reasoning for feasibility scores.
 
 ## AI-Powered Reasoning Agent
 
 ### Features
+
 - **Contextual Analysis**: Explains scores based on user priorities
 - **Natural Language Output**: Provides human-readable explanations
 - **Data Integration**: Combines quantitative scores with qualitative insights
 - **Customizable**: Adapts to different weighting scenarios
 
 ### Implementation
+
 - Built on CrewAI multi-agent framework
 - Integrated with Google Gemini for advanced reasoning
 - Provides 2-3 sentence explanations tailored to specific scores
@@ -222,7 +246,6 @@ The application is structured into three main panels:
 - State Management: React hooks (useState, useEffect, useMemo)
 
 - Icons & UI: Lucide-react + custom components
-
 
 ## Team and Contribution
 
