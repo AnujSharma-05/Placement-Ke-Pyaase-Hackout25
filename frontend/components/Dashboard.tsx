@@ -8,10 +8,9 @@ import { getInitialMapData, optimizePoint, getReasoning, optimizeGrid } from '..
 
 interface DashboardProps {
   onLogout: () => void;
-  onNavigate: (page: 'landing' | 'dashboard' | 'about') => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ onLogout, onNavigate }) => {
+const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   // Backend data state
   const [initialData, setInitialData] = useState(null);
   const [optimizationResult, setOptimizationResult] = useState(null);
@@ -98,6 +97,42 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout, onNavigate }) => {
     setNumResults(value);
   }, []);
 
+  // Helper function to get approximate location name from coordinates
+  const getLocationName = async (latitude: number, longitude: number): Promise<string> => {
+    try {
+      // Using OpenStreetMap's Nominatim API for reverse geocoding (free)
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10&addressdetails=1`
+      );
+      
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Extract meaningful location components
+        const address = data.address || {};
+        const city = address.city || address.town || address.village || address.suburb;
+        const state = address.state;
+        const district = address.state_district;
+        
+        // Build a meaningful name
+        if (city && state) {
+          return `${city}, ${state}`;
+        } else if (district && state) {
+          return `${district}, ${state}`;
+        } else if (state) {
+          return `Near ${state}`;
+        } else {
+          return `Location ${latitude.toFixed(2)}°N, ${longitude.toFixed(2)}°E`;
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to get location name:', error);
+    }
+    
+    // Fallback to coordinates
+    return `Location ${latitude.toFixed(2)}°N, ${longitude.toFixed(2)}°E`;
+  };
+
   // Optimize grid handler
   const handleOptimizeGrid = useCallback(async () => {
     setGridLoading(true);
@@ -111,23 +146,31 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout, onNavigate }) => {
       };
       const response = await optimizeGrid(weights, numResults);
       
-      // Format results for the ResultsPanel
-      const formattedResults = response.results.map((result: any, index: number) => ({
-        id: index,
-        name: `Station ${index + 1}`,
-        coords: [result.latitude, result.longitude] as L.LatLngTuple,
-        score: result.overallScore,
-        details: {
-          power: result.subScores.power,
-          market: result.subScores.market,
-          logistics: result.subScores.logistics
-        }
-      }));
+      // Format results with location names
+      const formattedResults = await Promise.all(
+        response.results.map(async (result: any, index: number) => {
+          // Get the location name for each coordinate
+          const locationName = await getLocationName(result.latitude, result.longitude);
+          
+          return {
+            id: index,
+            name: locationName, // Now using actual location name instead of "Station X"
+            coords: [result.latitude, result.longitude] as L.LatLngTuple,
+            score: result.overallScore,
+            details: {
+              power: result.subScores.power,
+              market: result.subScores.market,
+              logistics: result.subScores.logistics
+            }
+          };
+        })
+      );
       
       setGridResults(formattedResults);
       setOptimizedLocations(response.results); // For map display
     } catch (err) {
       setError('Failed to optimize grid');
+      console.error('Grid optimization error:', err);
     } finally {
       setGridLoading(false);
     }
@@ -139,7 +182,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout, onNavigate }) => {
 
   return (
     <div className="h-screen w-screen flex flex-col bg-gray-800">
-      <Navbar onLogout={onLogout} onNavigate={onNavigate} currentPage="dashboard" />
+      <Navbar onLogout={onLogout} />
 
       <div className="flex-1 flex overflow-hidden">
         {/* Left Sidebar */}
@@ -181,17 +224,20 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout, onNavigate }) => {
             <h2 className="text-lg font-semibold text-gray-200 mb-4 border-b border-gray-700 pb-2">
               Hydrogen Assistant
             </h2>
-            <div className="flex-1 flex flex-col justify-between bg-gray-800 rounded-lg p-4">
-                <div className="space-y-4 overflow-y-auto">
-                    <div className="p-3 bg-gray-700 rounded-lg self-start max-w-xs">
+            <div className="flex-1 flex flex-col bg-gray-800 rounded-lg p-4 min-h-0">
+                {/* Scrollable Messages Container */}
+                <div className="flex-1 overflow-y-auto pr-2 space-y-4 min-h-0" style={{ maxHeight: 'calc(100vh - 300px)' }}>
+                    {/* Initial greeting message */}
+                    <div className="p-3 bg-gray-700 rounded-lg self-start">
                         <p className="text-sm text-gray-200">
                           👋 Hi! I'm your AI assistant for hydrogen infrastructure analysis. 
                           Click on the map to get detailed insights about any location!
                         </p>
                     </div>
                     
+                    {/* Loading message */}
                     {isFeasibilityLoading && (
-                      <div className="p-3 bg-blue-800/50 rounded-lg self-start max-w-xs">
+                      <div className="p-3 bg-blue-800/50 rounded-lg self-start">
                         <div className="flex items-center">
                           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-400 mr-2"></div>
                           <p className="text-sm text-gray-200">Analyzing location...</p>
@@ -199,8 +245,9 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout, onNavigate }) => {
                       </div>
                     )}
                     
+                    {/* AI Reasoning Response */}
                     {reasoning && !isFeasibilityLoading && (
-                        <div className="p-3 bg-green-800 rounded-lg self-start max-w-xs">
+                        <div className="p-3 bg-green-800 rounded-lg self-start">
                             <div className="flex items-start">
                               <div className="w-2 h-2 bg-green-400 rounded-full mt-2 mr-2 flex-shrink-0"></div>
                               <div>
@@ -211,29 +258,46 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout, onNavigate }) => {
                         </div>
                     )}
 
+                    {/* Quick Summary */}
                     {feasibilityResult && !isFeasibilityLoading && (
-                      <div className="p-3 bg-purple-800/50 rounded-lg self-start max-w-xs">
+                      <div className="p-3 bg-purple-800/50 rounded-lg self-start">
                         <p className="text-xs font-medium text-purple-300 mb-2">Quick Summary</p>
                         <p className="text-sm text-gray-200">
-                          📍 Location analyzed: {feasibilityResult.coordinate?.latitude.toFixed(3)}, {feasibilityResult.coordinate?.longitude.toFixed(3)}
+                          📍 Location: {feasibilityResult.coordinate?.latitude.toFixed(3)}, {feasibilityResult.coordinate?.longitude.toFixed(3)}
                         </p>
                         <p className="text-sm text-gray-200 mt-1">
-                          🏆 Overall Score: <span className="font-bold text-green-400">{feasibilityResult.overallScore}/100</span>
+                          🏆 Overall Score: <span className="font-bold text-green-400">{feasibilityResult.overallScore}/10</span>
                         </p>
+                        <div className="mt-2 space-y-1">
+                          <div className="flex justify-between text-xs">
+                            <span className="text-gray-300">Power:</span>
+                            <span className="text-blue-400">{feasibilityResult.subScores?.power}/10</span>
+                          </div>
+                          <div className="flex justify-between text-xs">
+                            <span className="text-gray-300">Market:</span>
+                            <span className="text-yellow-400">{feasibilityResult.subScores?.market}/10</span>
+                          </div>
+                          <div className="flex justify-between text-xs">
+                            <span className="text-gray-300">Logistics:</span>
+                            <span className="text-purple-400">{feasibilityResult.subScores?.logistics}/10</span>
+                          </div>
+                        </div>
                       </div>
                     )}
                 </div>
-                <div className="mt-4">
+                
+                {/* Input Area - Fixed at bottom */}
+                <div className="mt-4 border-t border-gray-700 pt-4">
                     <textarea 
-                        className="w-full h-16 p-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="w-full h-16 p-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
                         placeholder="Ask a question about hydrogen infrastructure..."
                         disabled
                     />
+                    <p className="text-xs text-gray-500 text-center mt-2">
+                      🤖 AI-powered insights • Interactive chat coming soon
+                    </p>
                 </div>
             </div>
-            <p className="text-xs text-gray-500 text-center mt-4">
-              🤖 AI-powered insights • Interactive chat coming soon
-            </p>
         </aside>
       </div>
       
