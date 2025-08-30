@@ -4,7 +4,7 @@
 
 ### Screenshot (Preview)
 
-![UI Dashboard](ui_dashboard.jpg)
+![UI Dashboard](/../hackout/ui_dashboard.jpg)
 
 ## Project Description
 A comprehensive supply chain optimization and feasibility analysis system for green hydrogen project placement in India. This platform helps investors, policymakers, and energy companies identify optimal locations for green hydrogen production facilities by analyzing proximity to renewable energy sources, market demand centers, and logistics infrastructure.
