@@ -5,7 +5,7 @@ import os
 
 # _BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # DATA_DIR = os.path.join(_BASE_DIR, '..', 'data')
-DATA_DIR = 'B:\STUDY_VEDESH_laptop\coding_new\Placement-Ke-Pyaase-Hackout25\\backend\\app\data\\app\data'
+DATA_DIR = r'C:\\MeetJain\\Hackathons\\hackout\\Placement-Ke-Pyaase-Hackout25\\backend\\app\\data\\app\\data'
 
 def load_all_data():
     """
@@ -39,7 +39,15 @@ def load_all_data():
             wind_df[['State', 'type', 'capacity_mw', 'latitude', 'longitude']]
         ], ignore_index=True)
 
-        # Drop any rows that failed to geocode
+        # Convert lat/lon to numeric first to handle empty strings
+        renewable_plants_df['latitude'] = pd.to_numeric(renewable_plants_df['latitude'], errors='coerce')
+        renewable_plants_df['longitude'] = pd.to_numeric(renewable_plants_df['longitude'], errors='coerce')
+        demand_df['latitude'] = pd.to_numeric(demand_df['latitude'], errors='coerce')
+        demand_df['longitude'] = pd.to_numeric(demand_df['longitude'], errors='coerce')
+        logistics_df['latitude'] = pd.to_numeric(logistics_df['latitude'], errors='coerce')
+        logistics_df['longitude'] = pd.to_numeric(logistics_df['longitude'], errors='coerce')
+
+        # Drop any rows that failed to geocode or have invalid coordinates
         renewable_plants_df.dropna(subset=['latitude', 'longitude'], inplace=True)
         demand_df.dropna(subset=['latitude', 'longitude'], inplace=True)
         logistics_df.dropna(subset=['latitude', 'longitude'], inplace=True)

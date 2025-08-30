@@ -84,6 +84,9 @@ def get_initial_map_data():
         })
 
     except Exception as e:
+        print(f"Error in get_initial_map_data: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({"error": str(e)}), 500
 
 
@@ -174,5 +177,7 @@ def analyze_reasoning():
         return jsonify({"reasoning": reasoning_text})
 
     except Exception as e:
-        # It's good practice to log the error, e.g., print(e) or use a logger
+        import traceback
+        print("Error in analyze_reasoning endpoint:", str(e))
+        traceback.print_exc()
         return jsonify({"error": "Failed to generate reasoning.", "details": str(e)}), 500
