@@ -1,0 +1,5 @@
+{
+  "name": "Green Hydrogen Infrastructure Mapping Tool",
+  "description": "A web application to visualize existing and planned green hydrogen infrastructure, and receive recommendations for optimal new project sites, starting with Gujarat, India.",
+  "requestFramePermissions": []
+}
