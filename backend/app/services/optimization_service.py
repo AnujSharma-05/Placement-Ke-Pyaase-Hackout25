@@ -143,6 +143,7 @@ def calculate_score_for_coordinate(user_lat, user_lon, weights, renewable_df, de
     return result
 
 
+
 def create_radius_grid(center_lat, center_lng, radius_km, step_km=5):
     """
     Creates a dense grid of points within a specified radius around a center point.
@@ -286,4 +287,53 @@ def calculate_radius_optimization(center_lat, center_lng, radius_km, weights,
         "centerPoint": {"latitude": center_lat, "longitude": center_lng},
         "radius": radius_km,
         "gridPointsAnalyzed": len(grid_points)
+=======
+
+def analyze_power_supply_for_coordinate(user_lat, user_lon, required_capacity_mw, renewable_df, num_nearest=5):
+    """
+    Analyzes the power supply from the N nearest renewable plants for a specific coordinate.
+    """
+    if renewable_df.empty:
+        return {"error": "Renewable plants data is not available."}
+
+    # Convert coordinates to radians for calculation
+    user_point_rad = np.radians([[user_lat, user_lon]])
+    renewable_rad = np.radians(renewable_df[['latitude', 'longitude']].values)
+
+    # Calculate distances from the user's point to ALL renewable plants
+    distances_km = (haversine_distances(user_point_rad, renewable_rad) * 6371).flatten()
+    
+    # Add distances to the DataFrame and find the N nearest plants
+    analysis_df = renewable_df.copy()
+    analysis_df['distance_km'] = distances_km
+    nearest_plants_df = analysis_df.sort_values(by='distance_km').head(num_nearest)
+
+    # Calculate the total available capacity from these nearby plants
+    total_available_capacity = float(nearest_plants_df['capacity_mw'].sum())
+
+    # Calculate a "Supply Score" (0-10). Capped at 10.
+    # If available capacity exactly meets required, score is 10.
+    # If it's double or more, it's still 10.
+    supply_score = min(10.0, (total_available_capacity / required_capacity_mw) * 10)
+
+    # Format the nearest plants data for a clean JSON response
+    top_plants_raw = nearest_plants_df[[
+        'State', 'type', 'capacity_mw', 'distance_km'
+    ]].round(2).to_dict(orient='records')
+
+    top_plants_clean = []
+    for plant in top_plants_raw:
+        top_plants_clean.append({
+            "State": plant["State"],
+            "type": plant["type"],
+            "capacity_mw": float(plant["capacity_mw"]),
+            "distance_km": float(plant["distance_km"])
+        })
+
+    return {
+        "required_capacity_mw": required_capacity_mw,
+        "total_available_capacity_mw": round(total_available_capacity, 2),
+        "supply_score": round(supply_score, 2),
+        "nearest_plants": top_plants_clean # Return the cleaned list
+
     }
