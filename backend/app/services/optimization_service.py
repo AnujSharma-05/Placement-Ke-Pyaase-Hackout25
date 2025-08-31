@@ -287,7 +287,7 @@ def calculate_radius_optimization(center_lat, center_lng, radius_km, weights,
         "centerPoint": {"latitude": center_lat, "longitude": center_lng},
         "radius": radius_km,
         "gridPointsAnalyzed": len(grid_points)
-=======
+    }
 
 def analyze_power_supply_for_coordinate(user_lat, user_lon, required_capacity_mw, renewable_df, num_nearest=5):
     """

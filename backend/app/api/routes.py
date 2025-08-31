@@ -232,7 +232,6 @@ def optimize_radius():
         print("Error in optimize_radius endpoint:", str(e))
         traceback.print_exc()
         return jsonify({"error": "Failed to optimize radius.", "details": str(e)}), 500
-=======
     
 
 @api_bp.route('/analyze-power-supply', methods=['POST'])

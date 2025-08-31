@@ -98,8 +98,9 @@ def get_reasoning_for_data(weights, scores_data):
     )
 
     # Create and run the Crew
+    # Adding extra agent here to get cost
     crew = Crew(
-        agents=[analyst_agent],
+        agents=[analyst_agent, financial_analyst_agent],
         tasks=[analysis_task],
         verbose=True,
         process=Process.sequential
