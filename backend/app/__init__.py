@@ -12,7 +12,8 @@ def create_app(config_class):
 
     # Initialize CORS to allow requests from your React frontend
     # Update 'http://localhost:3000' to your React app's URL
-    CORS(app, resources={r"/api/*": {"origins": "http://localhost:5173"}})
+    # CORS(app, resources={r"/api/*": {"origins": "http://localhost:5173"}})
+    CORS(app, resources={r"/api/*": {"origins": "https://placement-ke-pyaase-hackout25.onrender.com/"}})
 
     """Change here for 5174 as they are running on port 5174"""
 
