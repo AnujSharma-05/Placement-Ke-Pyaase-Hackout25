@@ -31,6 +31,10 @@ interface MapProps {
     };
   }>;
   pinpoint?: { lat: number; lng: number } | null;
+  // New props for radius mode
+  radiusMode?: boolean;
+  centerPoint?: { lat: number; lng: number } | null;
+  selectedRadius?: number;
 }
 
 const getIcon = (type: InfrastructureType) => {
@@ -132,12 +136,16 @@ const Map: React.FC<MapProps> = ({
   visibleLayers, 
   onMapClick, 
   optimizedLocations = [], 
-  pinpoint 
+  pinpoint,
+  radiusMode = false,
+  centerPoint = null,
+  selectedRadius = 100
 }) => {
   const mapRef = useRef<L.Map | null>(null);
   const layersRef = useRef<{[key: string]: L.LayerGroup}>({});
   const pinpointMarkerRef = useRef<L.Marker | null>(null);
   const optimizedMarkersRef = useRef<L.Marker[]>([]);
+  const radiusCircleRef = useRef<L.Circle | null>(null);
 
   // Initialize map
   useEffect(() => {
@@ -263,6 +271,29 @@ const Map: React.FC<MapProps> = ({
       }
     }
   }, [pinpoint]);
+
+  // Handle radius circle for radius mode
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    // Remove existing radius circle
+    if (radiusCircleRef.current) {
+      radiusCircleRef.current.remove();
+      radiusCircleRef.current = null;
+    }
+
+    // Add radius circle if in radius mode and center point is set
+    if (radiusMode && centerPoint) {
+      radiusCircleRef.current = L.circle([centerPoint.lat, centerPoint.lng], {
+        radius: selectedRadius * 1000, // Convert km to meters for Leaflet
+        color: '#10b981', // emerald-500
+        fillColor: '#10b981',
+        fillOpacity: 0.1,
+        weight: 2,
+        dashArray: '5, 5' // Dashed line for better visibility
+      }).addTo(mapRef.current);
+    }
+  }, [radiusMode, centerPoint, selectedRadius]);
 
   // Handle optimized locations markers
   useEffect(() => {

@@ -5,6 +5,7 @@ import DataLayersPanel from './DataLayersPanel';
 import SlidersPanel from './SlidersPanel';
 import ResultsPanel from './ResultsPanel';
 import FeasibilityPanel from './FeasibilityPanel';
+import RadiusPanel from './RadiusPanel';
 
 interface AnalysisSidebarProps {
   visibleLayers: { [key in InfrastructureType]?: boolean };
@@ -21,6 +22,15 @@ interface AnalysisSidebarProps {
   // New props for feasibility analysis
   feasibilityResult?: any;
   isFeasibilityLoading?: boolean;
+  // New props for radius-based analysis
+  radiusMode: boolean;
+  selectedRadius: number;
+  centerPoint: { lat: number; lng: number } | null;
+  onRadiusModeToggle: () => void;
+  onRadiusChange: (radius: number) => void;
+  onRadiusOptimize: () => void;
+  radiusResults: AnalysisResult[];
+  radiusLoading: boolean;
 }
 
 const AnalysisSidebar: React.FC<AnalysisSidebarProps> = (props) => {
@@ -42,8 +52,19 @@ const AnalysisSidebar: React.FC<AnalysisSidebarProps> = (props) => {
             isLoading={props.isLoading}
         />
 
+        <RadiusPanel
+            radiusMode={props.radiusMode}
+            selectedRadius={props.selectedRadius}
+            centerPoint={props.centerPoint}
+            onRadiusModeToggle={props.onRadiusModeToggle}
+            onRadiusChange={props.onRadiusChange}
+            onRadiusOptimize={props.onRadiusOptimize}
+            radiusResults={props.radiusResults}
+            radiusLoading={props.radiusLoading}
+        />
+
         <ResultsPanel
-            results={props.results}
+            results={props.radiusMode ? props.radiusResults : props.results}
             onResultClick={props.onResultClick}
         />
 

@@ -141,3 +141,149 @@ def calculate_score_for_coordinate(user_lat, user_lon, weights, renewable_df, de
     }
 
     return result
+
+
+def create_radius_grid(center_lat, center_lng, radius_km, step_km=5):
+    """
+    Creates a dense grid of points within a specified radius around a center point.
+    
+    Args:
+        center_lat, center_lng: Center coordinates
+        radius_km: Radius in kilometers
+        step_km: Grid resolution in kilometers (smaller = more dense)
+    
+    Returns:
+        numpy array of [lat, lng] coordinates within the radius
+    """
+    # Convert km to approximate degrees (rough approximation)
+    # 1 degree ≈ 111 km at equator, varies by latitude
+    lat_deg_per_km = 1.0 / 111.0
+    lng_deg_per_km = 1.0 / (111.0 * np.cos(np.radians(center_lat)))
+    
+    # Calculate grid bounds
+    radius_lat = radius_km * lat_deg_per_km
+    radius_lng = radius_km * lng_deg_per_km
+    step_lat = step_km * lat_deg_per_km
+    step_lng = step_km * lng_deg_per_km
+    
+    # Create grid
+    lat_min = center_lat - radius_lat
+    lat_max = center_lat + radius_lat
+    lng_min = center_lng - radius_lng
+    lng_max = center_lng + radius_lng
+    
+    lat_grid = np.arange(lat_min, lat_max, step_lat)
+    lng_grid = np.arange(lng_min, lng_max, step_lng)
+    
+    # Create all combinations
+    grid_points = []
+    for lat in lat_grid:
+        for lng in lng_grid:
+            # Check if point is within radius using Haversine distance
+            distance = haversine_distance(center_lat, center_lng, lat, lng)
+            if distance <= radius_km:
+                grid_points.append([lat, lng])
+    
+    return np.array(grid_points)
+
+
+def haversine_distance(lat1, lng1, lat2, lng2):
+    """
+    Calculate the great circle distance between two points on Earth (in km)
+    """
+    # Convert to radians
+    lat1, lng1, lat2, lng2 = map(np.radians, [lat1, lng1, lat2, lng2])
+    
+    # Haversine formula
+    dlat = lat2 - lat1
+    dlng = lng2 - lng1
+    a = np.sin(dlat/2)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlng/2)**2
+    c = 2 * np.arcsin(np.sqrt(a))
+    
+    # Radius of Earth in kilometers
+    R = 6371
+    return R * c
+
+
+def calculate_radius_optimization(center_lat, center_lng, radius_km, weights, 
+                                renewable_df, demand_df, logistics_df, num_results=3):
+    """
+    Advanced radius-based optimization that ALWAYS returns the top N locations
+    within the specified radius, regardless of absolute score quality.
+    
+    This function:
+    1. Creates a dense grid within the radius
+    2. Scores every point using the ML model
+    3. Returns the top N results with real location context
+    """
+    print(f"Starting radius optimization for center ({center_lat}, {center_lng}) with {radius_km}km radius...")
+    
+    # Create a dense grid within the radius (5km resolution for good coverage)
+    grid_points = create_radius_grid(center_lat, center_lng, radius_km, step_km=5)
+    print(f"Created grid with {len(grid_points)} points within {radius_km}km radius")
+    
+    if len(grid_points) == 0:
+        return {
+            "results": [],
+            "message": f"No grid points found within {radius_km}km radius",
+            "centerPoint": {"latitude": center_lat, "longitude": center_lng},
+            "radius": radius_km
+        }
+    
+    # Convert to radians for distance calculations
+    grid_points_rad = np.radians(grid_points)
+    renewable_rad = np.radians(renewable_df[['latitude', 'longitude']].values)
+    demand_rad = np.radians(demand_df[['latitude', 'longitude']].values)
+    logistics_rad = np.radians(logistics_df[['latitude', 'longitude']].values)
+
+    print("Calculating scores for all grid points...")
+    
+    # Calculate scores for all grid points
+    power_scores = calculate_scores(grid_points_rad, renewable_rad)
+    market_scores = calculate_scores(grid_points_rad, demand_rad)
+    logistics_scores = calculate_scores(grid_points_rad, logistics_rad)
+
+    # Calculate final weighted scores
+    overall_scores = (
+        weights['power'] * power_scores +
+        weights['market'] * market_scores +
+        weights['logistics'] * logistics_scores
+    )
+
+    # Create results DataFrame
+    results_df = pd.DataFrame(grid_points, columns=['latitude', 'longitude'])
+    results_df['overallScore'] = overall_scores
+    results_df['powerScore'] = power_scores
+    results_df['marketScore'] = market_scores
+    results_df['logisticsScore'] = logistics_scores
+    
+    # Sort by overall score and get top N results
+    top_results = results_df.sort_values(by='overallScore', ascending=False).head(num_results)
+    
+    print(f"Returning top {len(top_results)} results within radius")
+    
+    # Format for JSON output
+    output = []
+    for _, row in top_results.iterrows():
+        # Calculate distance from center
+        distance = haversine_distance(center_lat, center_lng, row['latitude'], row['longitude'])
+        
+        output.append({
+            'latitude': round(row['latitude'], 6),
+            'longitude': round(row['longitude'], 6),
+            'overallScore': round(row['overallScore'], 2),
+            'subScores': {
+                'power': round(row['powerScore'], 2),
+                'market': round(row['marketScore'], 2),
+                'logistics': round(row['logisticsScore'], 2)
+            },
+            'distanceFromCenter': round(distance, 2)
+        })
+        
+    return {
+        "results": output,
+        "message": f"Found {len(output)} optimal locations within {radius_km}km radius",
+        "centerPoint": {"latitude": center_lat, "longitude": center_lng},
+        "radius": radius_km,
+        "gridPointsAnalyzed": len(grid_points)
+    }
