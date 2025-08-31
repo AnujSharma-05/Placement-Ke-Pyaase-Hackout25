@@ -28,8 +28,8 @@ const AppContent: React.FC = () => {
 
   return (
     <div
-      className={`h-screen w-screen bg-gray-900 text-gray-100 font-sans ${
-        isLandingPage ? "overflow-y-auto" : "overflow-hidden"
+      className={`w-screen bg-gray-900 text-gray-100 font-sans ${
+        isLandingPage ? "min-h-screen overflow-y-auto" : "h-screen overflow-hidden"
       }`}
     >
       <Routes>

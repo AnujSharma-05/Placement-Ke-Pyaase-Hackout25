@@ -54,7 +54,7 @@ analyst_agent = Agent(
 # --- AGENT 2: The New Financial Specialist ---
 financial_analyst_agent = Agent(
     role="Financial Analyst for Green Energy Projects",
-    goal="To estimate the preliminary Capital Expenditure (CAPEX) and annual Operational Expenditure (OPEX) for a proposed Green Hydrogen project (in Indian Rupee).",
+    goal="To estimate the preliminary Capital Expenditure (CAPEX) and annual Operational Expenditure (OPEX) for a proposed Green Hydrogen project (in Indian Rupee - compulsory convert to indian rupee).",
     backstory=(
         "You are a meticulous financial analyst with deep experience in cost modeling for renewable energy infrastructure in India. "
         "You provide high-level, indicative cost estimates to guide initial investment decisions. "
@@ -98,8 +98,9 @@ def get_reasoning_for_data(weights, scores_data):
     )
 
     # Create and run the Crew
+    # Adding extra agent here to get cost
     crew = Crew(
-        agents=[analyst_agent],
+        agents=[analyst_agent, financial_analyst_agent],
         tasks=[analysis_task],
         verbose=True,
         process=Process.sequential

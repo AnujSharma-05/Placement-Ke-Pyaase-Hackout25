@@ -5,6 +5,8 @@ import DataLayersPanel from './DataLayersPanel';
 import SlidersPanel from './SlidersPanel';
 import ResultsPanel from './ResultsPanel';
 import FeasibilityPanel from './FeasibilityPanel';
+import RadiusPanel from './RadiusPanel';
+import PowerSupplyPanel from './PowerSupplyPanel';
 
 interface AnalysisSidebarProps {
   visibleLayers: { [key in InfrastructureType]?: boolean };
@@ -21,6 +23,21 @@ interface AnalysisSidebarProps {
   // New props for feasibility analysis
   feasibilityResult?: any;
   isFeasibilityLoading?: boolean;
+  // New props for radius-based analysis
+  radiusMode: boolean;
+  selectedRadius: number;
+  centerPoint: { lat: number; lng: number } | null;
+  onRadiusModeToggle: () => void;
+  onRadiusChange: (radius: number) => void;
+  onRadiusOptimize: () => void;
+  radiusResults: AnalysisResult[];
+  radiusLoading: boolean;
+  // New props for power supply analysis
+  powerSupplyResult?: any;
+  isPowerSupplyLoading?: boolean;
+  onAnalyzePowerSupply?: (requiredCapacity: number) => void;
+  // New prop for visual analytics
+  onOpenVisualAnalytics?: () => void;
 }
 
 const AnalysisSidebar: React.FC<AnalysisSidebarProps> = (props) => {
@@ -42,8 +59,19 @@ const AnalysisSidebar: React.FC<AnalysisSidebarProps> = (props) => {
             isLoading={props.isLoading}
         />
 
+        <RadiusPanel
+            radiusMode={props.radiusMode}
+            selectedRadius={props.selectedRadius}
+            centerPoint={props.centerPoint}
+            onRadiusModeToggle={props.onRadiusModeToggle}
+            onRadiusChange={props.onRadiusChange}
+            onRadiusOptimize={props.onRadiusOptimize}
+            radiusResults={props.radiusResults}
+            radiusLoading={props.radiusLoading}
+        />
+
         <ResultsPanel
-            results={props.results}
+            results={props.radiusMode ? props.radiusResults : props.results}
             onResultClick={props.onResultClick}
         />
 
@@ -52,6 +80,29 @@ const AnalysisSidebar: React.FC<AnalysisSidebarProps> = (props) => {
             isLoading={props.isFeasibilityLoading || false}
             pinpoint={props.pinpoint}
         />
+
+        <PowerSupplyPanel
+            pinpoint={props.pinpoint}
+            result={props.powerSupplyResult}
+            isLoading={props.isPowerSupplyLoading || false}
+            onAnalyzePowerSupply={props.onAnalyzePowerSupply}
+        />
+
+        {/* Visual Analytics Button */}
+        <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+          <h3 className="text-lg font-bold text-gray-200 mb-3 flex items-center gap-2">
+            📊 Advanced Analytics
+          </h3>
+          <button
+            onClick={props.onOpenVisualAnalytics}
+            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
+          >
+            <span>🔍 Visual Analytics</span>
+          </button>
+          <p className="text-xs text-gray-400 mt-2 text-center">
+            Interactive charts & performance metrics
+          </p>
+        </div>
       </div>
     </aside>
   );
