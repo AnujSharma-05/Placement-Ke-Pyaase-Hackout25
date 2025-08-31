@@ -184,6 +184,55 @@ def analyze_reasoning():
 
         # It's good practice to log the error, e.g., print(e) or use a logger
         return jsonify({"error": "Failed to generate reasoning.", "details": str(e)}), 500
+
+
+
+# --- NEW ENDPOINT 4: RADIUS-BASED OPTIMIZATION ---
+@api_bp.route('/optimize-radius', methods=['POST'])
+def optimize_radius():
+    """
+    Endpoint for radius-based optimization. Creates a dense grid within the specified radius
+    and returns the top N locations with their scores, regardless of absolute score quality.
+    """
+    data = request.get_json()
+    if not data or 'weights' not in data or 'centerPoint' not in data or 'radius' not in data:
+        return jsonify({"error": "Missing 'weights', 'centerPoint', or 'radius' in request body"}), 400
+
+    try:
+        weights = data['weights']
+        center_point = data['centerPoint']
+        radius_km = data['radius']
+        num_results = data.get('numResults', 3)  # Default to 3 results
+        
+        center_lat = center_point.get('latitude')
+        center_lng = center_point.get('longitude')
+        
+        if center_lat is None or center_lng is None:
+            return jsonify({"error": "Missing 'latitude' or 'longitude' in centerPoint object"}), 400
+
+        # Load data on-demand
+        renewable_df, demand_df, logistics_df = load_all_data()
+
+        # Call the new radius optimization service
+        from ..services.optimization_service import calculate_radius_optimization
+        result = calculate_radius_optimization(
+            center_lat=center_lat,
+            center_lng=center_lng,
+            radius_km=radius_km,
+            weights=weights,
+            renewable_df=renewable_df,
+            demand_df=demand_df,
+            logistics_df=logistics_df,
+            num_results=num_results
+        )
+        return jsonify(result)
+
+    except Exception as e:
+        import traceback
+        print("Error in optimize_radius endpoint:", str(e))
+        traceback.print_exc()
+        return jsonify({"error": "Failed to optimize radius.", "details": str(e)}), 500
+=======
     
 
 @api_bp.route('/analyze-power-supply', methods=['POST'])

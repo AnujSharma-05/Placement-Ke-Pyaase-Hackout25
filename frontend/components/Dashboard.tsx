@@ -4,7 +4,7 @@ import Map from './Map';
 import { InfrastructureType, AnalysisResult } from '../types';
 import Navbar from './Navbar';
 import AnalysisSidebar from './AnalysisSidebar';
-import { getInitialMapData, optimizePoint, getReasoning, optimizeGrid } from '../src/services/api';
+import { getInitialMapData, optimizePoint, getReasoning, optimizeGrid, optimizeRadius } from '../src/services/api';
 
 interface DashboardProps {
   onLogout: () => void;
@@ -27,6 +27,13 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const [numResults, setNumResults] = useState(5);
   const [gridResults, setGridResults] = useState<AnalysisResult[]>([]);
   const [gridLoading, setGridLoading] = useState(false);
+
+  // For radius-based analysis
+  const [radiusMode, setRadiusMode] = useState(false);
+  const [selectedRadius, setSelectedRadius] = useState(100); // Default 100km
+  const [centerPoint, setCenterPoint] = useState<{ lat: number; lng: number } | null>(null);
+  const [radiusResults, setRadiusResults] = useState<AnalysisResult[]>([]);
+  const [radiusLoading, setRadiusLoading] = useState(false);
 
   // Map state
   const [visibleLayers, setVisibleLayers] = useState<{ [key in InfrastructureType]?: boolean }>({
@@ -52,12 +59,21 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
     fetchData();
   }, []);
 
-  // Map click handler - Updated for feasibility analysis
+  // Map click handler - Updated for both feasibility analysis and radius mode
   const handleMapClick = useCallback(async (latitude: number, longitude: number) => {
     setError('');
     setReasoning('');
-    setIsFeasibilityLoading(true);
     setPinpoint({ lat: latitude, lng: longitude });
+    
+    // If radius mode is enabled, set this as the center point
+    if (radiusMode) {
+      setCenterPoint({ lat: latitude, lng: longitude });
+      // Don't run feasibility analysis in radius mode, just set the center
+      return;
+    }
+    
+    // Normal feasibility analysis
+    setIsFeasibilityLoading(true);
     
     const coordinate = { latitude, longitude };
     // Use current slider values for weights
@@ -83,7 +99,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
     } finally {
       setIsFeasibilityLoading(false);
     }
-  }, [sliderValues]);
+  }, [sliderValues, radiusMode]);
 
   const handleLayerToggle = useCallback((layer: InfrastructureType) => {
     setVisibleLayers(prev => ({ ...prev, [layer]: !prev[layer] }));
@@ -96,6 +112,35 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const handleNumResultsChange = useCallback((value: number) => {
     setNumResults(value);
   }, []);
+
+  // Radius mode handlers
+  const handleRadiusModeToggle = useCallback(() => {
+    setRadiusMode(prev => !prev);
+    // Clear previous results when toggling mode
+    if (!radiusMode) {
+      setRadiusResults([]);
+      setCenterPoint(null);
+    } else {
+      setGridResults([]);
+    }
+  }, [radiusMode]);
+
+  const handleRadiusChange = useCallback((radius: number) => {
+    setSelectedRadius(radius);
+  }, []);
+
+  // Helper function to calculate distance between two points (Haversine formula)
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 6371; // Earth's radius in kilometers
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c; // Distance in kilometers
+  };
 
   // Helper function to get approximate location name from coordinates
   const getLocationName = async (latitude: number, longitude: number): Promise<string> => {
@@ -175,6 +220,67 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
       setGridLoading(false);
     }
   }, [sliderValues, numResults]);
+
+  // Radius-based optimization handler
+  const handleRadiusOptimization = useCallback(async () => {
+    if (!centerPoint) {
+      setError('Please click on the map to select a center point first');
+      return;
+    }
+
+    setRadiusLoading(true);
+    setError('');
+    
+    try {
+      const total = sliderValues.power + sliderValues.market + sliderValues.logistics;
+      const weights = {
+        power: sliderValues.power / total,
+        market: sliderValues.market / total,
+        logistics: sliderValues.logistics / total,
+      };
+      
+      // Use the new radius optimization API
+      const response = await optimizeRadius(
+        { latitude: centerPoint.lat, longitude: centerPoint.lng }, 
+        selectedRadius, 
+        weights, 
+        3 // Always get top 3 results
+      );
+      
+      console.log('Radius optimization response:', response);
+      
+      // Format results with location names
+      const formattedResults = await Promise.all(
+        response.results.map(async (result: any, index: number) => {
+          const locationName = await getLocationName(result.latitude, result.longitude);
+          
+          return {
+            id: index,
+            name: `${locationName} (${result.distanceFromCenter}km away)`,
+            coords: [result.latitude, result.longitude] as L.LatLngTuple,
+            score: result.overallScore,
+            details: {
+              power: result.subScores.power,
+              market: result.subScores.market,
+              logistics: result.subScores.logistics
+            }
+          };
+        })
+      );
+      
+      setRadiusResults(formattedResults);
+      setOptimizedLocations(response.results); // For map display
+      
+      // Show success message with analysis info
+      console.log(`✅ Found ${response.results.length} locations within ${selectedRadius}km radius (analyzed ${response.gridPointsAnalyzed} grid points)`);
+      
+    } catch (err) {
+      setError('Failed to find locations within radius');
+      console.error('Radius optimization error:', err);
+    } finally {
+      setRadiusLoading(false);
+    }
+  }, [centerPoint, selectedRadius, sliderValues, getLocationName]);
   
   const handleResultClick = useCallback((coords: L.LatLngTuple) => {
     setPinpoint({ lat: coords[0], lng: coords[1] });
@@ -200,6 +306,14 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           onResultClick={handleResultClick}
           feasibilityResult={feasibilityResult}
           isFeasibilityLoading={isFeasibilityLoading}
+          radiusMode={radiusMode}
+          selectedRadius={selectedRadius}
+          centerPoint={centerPoint}
+          onRadiusModeToggle={handleRadiusModeToggle}
+          onRadiusChange={handleRadiusChange}
+          onRadiusOptimize={handleRadiusOptimization}
+          radiusResults={radiusResults}
+          radiusLoading={radiusLoading}
         />
 
         {/* Center Map */}
@@ -211,6 +325,9 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
               onMapClick={handleMapClick}
               optimizedLocations={optimizedLocations}
               pinpoint={pinpoint}
+              radiusMode={radiusMode}
+              centerPoint={centerPoint}
+              selectedRadius={selectedRadius}
             />
           ) : (
             <div className="w-full h-full bg-gray-700 flex items-center justify-center">

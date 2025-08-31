@@ -56,3 +56,24 @@ export const getReasoning = async (scores, weights) => {
     }
     return response.json();
 };
+
+/**
+ * Finds the best locations within a specified radius around a center point.
+ * Always returns the top N results within the radius, even if scores are low.
+ */
+export const optimizeRadius = async (centerPoint, radius, weights, numResults = 3) => {
+    const response = await fetch(`${BASE_URL}/optimize-radius`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+            centerPoint, 
+            radius, 
+            weights, 
+            numResults 
+        }),
+    });
+    if (!response.ok) {
+        throw new Error('Failed to get radius optimization results');
+    }
+    return response.json();
+};
