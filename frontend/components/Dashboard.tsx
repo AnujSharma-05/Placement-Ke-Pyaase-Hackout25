@@ -4,6 +4,7 @@ import Map from './Map';
 import { InfrastructureType, AnalysisResult } from '../types';
 import Navbar from './Navbar';
 import AnalysisSidebar from './AnalysisSidebar';
+import VisualAnalytics from './VisualAnalytics';
 import { getInitialMapData, optimizePoint, getReasoning, optimizeGrid, optimizeRadius, analyzePowerSupply } from '../src/services/api';
 
 interface DashboardProps {
@@ -38,6 +39,9 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   // For power supply analysis
   const [powerSupplyResult, setPowerSupplyResult] = useState(null);
   const [isPowerSupplyLoading, setIsPowerSupplyLoading] = useState(false);
+
+  // For visual analytics
+  const [isVisualAnalyticsOpen, setIsVisualAnalyticsOpen] = useState(false);
 
   // Map state
   const [visibleLayers, setVisibleLayers] = useState<{ [key in InfrastructureType]?: boolean }>({
@@ -319,6 +323,15 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
     setPinpoint({ lat: coords[0], lng: coords[1] });
   }, []);
 
+  // Visual Analytics handler
+  const handleOpenVisualAnalytics = useCallback(() => {
+    setIsVisualAnalyticsOpen(true);
+  }, []);
+
+  const handleCloseVisualAnalytics = useCallback(() => {
+    setIsVisualAnalyticsOpen(false);
+  }, []);
+
   return (
     <div className="h-screen w-screen flex flex-col bg-gray-800">
       <Navbar onLogout={onLogout} />
@@ -350,6 +363,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           powerSupplyResult={powerSupplyResult}
           isPowerSupplyLoading={isPowerSupplyLoading}
           onAnalyzePowerSupply={handleAnalyzePowerSupply}
+          onOpenVisualAnalytics={handleOpenVisualAnalytics}
         />
 
         {/* Center Map */}
@@ -375,7 +389,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
         {/* Right Sidebar - Hydrogen Assistant */}
         <aside className="w-80 bg-gray-900 p-6 flex flex-col z-10 shadow-xl">
             <h2 className="text-lg font-semibold text-gray-200 mb-4 border-b border-gray-700 pb-2">
-              Hydrogen Assistant
+              Hydro Assistant
             </h2>
             <div className="flex-1 flex flex-col bg-gray-800 rounded-lg p-4 min-h-0">
                 {/* Scrollable Messages Container */}
@@ -383,8 +397,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                     {/* Initial greeting message */}
                     <div className="p-3 bg-gray-700 rounded-lg self-start">
                         <p className="text-sm text-gray-200">
-                          👋 Hi! I'm your AI assistant for hydrogen infrastructure analysis. 
-                          Click on the map to get detailed insights about any location!
+                          Lets Analyse Hydrogen Infrastructure!
                         </p>
                     </div>
                     
@@ -447,7 +460,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                         disabled
                     />
                     <p className="text-xs text-gray-500 text-center mt-2">
-                      🤖 AI-powered insights • Interactive chat coming soon
+                      AI-powered insights • Interactive chat coming soon
                     </p>
                 </div>
             </div>
@@ -460,6 +473,19 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           {error}
         </div>
       )}
+
+      {/* Visual Analytics Modal */}
+      <VisualAnalytics
+        isOpen={isVisualAnalyticsOpen}
+        onClose={handleCloseVisualAnalytics}
+        initialData={initialData}
+        gridResults={gridResults}
+        radiusResults={radiusResults}
+        feasibilityResult={feasibilityResult}
+        powerSupplyResult={powerSupplyResult}
+        sliderValues={sliderValues}
+        pinpoint={pinpoint}
+      />
     </div>
   );
 };

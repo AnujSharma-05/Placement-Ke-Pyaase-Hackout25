@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { ArrowDown, Atom } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import HydroAIModal from "./HydroAIModal";
 
 interface HeroProps {
   onExploreMap: () => void;
@@ -9,6 +10,15 @@ interface HeroProps {
 
 const Hero: React.FC<HeroProps> = ({ onExploreMap }) => {
   const navigate = useNavigate();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleMeetHydroAI = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -102,7 +112,7 @@ const Hero: React.FC<HeroProps> = ({ onExploreMap }) => {
             </motion.div>
             <span className="text-xl font-bold">OS</span>
           </motion.div>
-          <motion.button
+          {/* <motion.button
             initial={{ x: 20 }}
             animate={{ x: 0 }}
             whileHover={{ scale: 1.05 }}
@@ -111,7 +121,7 @@ const Hero: React.FC<HeroProps> = ({ onExploreMap }) => {
             className="px-6 py-2 border border-emerald-400 text-emerald-400 rounded-full hover:bg-emerald-400 hover:text-black transition-all duration-300"
           >
             Early Access
-          </motion.button>
+          </motion.button> */}
         </motion.nav>
 
         {/* Main Content */}
@@ -126,7 +136,7 @@ const Hero: React.FC<HeroProps> = ({ onExploreMap }) => {
                   transition={{ duration: 0.6 }}
                   className="inline-block px-4 py-2 bg-emerald-400/10 border border-emerald-400/30 rounded-full text-emerald-400 text-sm font-medium"
                 >
-                  HYDROGEN OPERATING SYSTEM
+                  HYDROGEN OPTIMIZATION SYSTEM  
                 </motion.div>
                 <motion.h1
                   className="text-6xl lg:text-8xl font-black leading-none"
@@ -198,10 +208,10 @@ const Hero: React.FC<HeroProps> = ({ onExploreMap }) => {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => navigate("/about")}
+                  onClick={handleMeetHydroAI}
                   className="px-8 py-4 border-2 border-white text-white font-bold rounded-none hover:bg-white hover:text-black transition-all duration-300"
                 >
-                  MEET HYDRO AI
+                  For GEEKS!
                 </motion.button>
               </motion.div>
             </div>
@@ -298,6 +308,9 @@ const Hero: React.FC<HeroProps> = ({ onExploreMap }) => {
           </div>
         </motion.div>
       </div>
+
+      {/* Technical Modal */}
+      <HydroAIModal isOpen={isModalOpen} onClose={handleCloseModal} />
 
       <style>{`
         @keyframes grid-move {

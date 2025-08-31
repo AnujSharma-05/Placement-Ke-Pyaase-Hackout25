@@ -1,7 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Bot, MessageSquare, Brain, Sparkles, ArrowRight } from 'lucide-react';
+import HydroAIModal from './HydroAIModal';
 
 const HydroAI = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleMeetHydroAI = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
   return (
     <section className="py-32 bg-white relative">
       <div className="max-w-7xl mx-auto px-8">
@@ -118,13 +128,19 @@ const HydroAI = () => {
               </div>
             </div>
 
-            <button className="group px-8 py-4 bg-black text-emerald-400 font-black text-lg hover:bg-gray-900 transition-all duration-300 flex items-center gap-3">
-              <span>CHAT WITH HYDRO</span>
+            <button 
+              onClick={handleMeetHydroAI}
+              className="group px-8 py-4 bg-black text-emerald-400 font-black text-lg hover:bg-gray-900 transition-all duration-300 flex items-center gap-3"
+            >
+              <span>MEET HYDRO AI</span>
               <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform duration-300" />
             </button>
           </div>
         </div>
       </div>
+
+      {/* Technical Modal */}
+      <HydroAIModal isOpen={isModalOpen} onClose={handleCloseModal} />
     </section>
   );
 };

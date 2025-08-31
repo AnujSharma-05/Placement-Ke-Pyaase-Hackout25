@@ -27,7 +27,7 @@ const RadiusPanel: React.FC<RadiusPanelProps> = ({
     <div className="bg-gray-800 rounded-lg p-4 space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-gray-200">
-          🎯 Radius Search
+          Radius Search
         </h3>
         <button
           onClick={onRadiusModeToggle}
