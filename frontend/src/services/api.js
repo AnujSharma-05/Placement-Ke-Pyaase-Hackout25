@@ -13,7 +13,12 @@ export const optimizeGrid = async (weights, numResults = 5) => {
     return response.json();
 };
 // The base URL of your Flask backend
-const BASE_URL = 'http://127.0.0.1:5000/api';
+// const BASE_URL = 'http://127.0.0.1:5000/api';
+
+
+// This line tries to get the production URL, but if it's not found (like on your local machine), it uses the local URL.
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:5000/api';
+
 // const BASE_URL = ''
 
 /**
