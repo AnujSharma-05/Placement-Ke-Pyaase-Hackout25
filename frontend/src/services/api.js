@@ -77,3 +77,21 @@ export const optimizeRadius = async (centerPoint, radius, weights, numResults = 
     }
     return response.json();
 };
+
+/**
+ * Analyzes power supply for a coordinate based on required capacity.
+ */
+export const analyzePowerSupply = async (coordinate, requiredCapacity) => {
+    const response = await fetch(`${BASE_URL}/analyze-power-supply`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+            coordinate, 
+            requiredCapacity 
+        }),
+    });
+    if (!response.ok) {
+        throw new Error('Failed to analyze power supply');
+    }
+    return response.json();
+};

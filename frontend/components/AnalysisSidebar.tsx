@@ -6,6 +6,7 @@ import SlidersPanel from './SlidersPanel';
 import ResultsPanel from './ResultsPanel';
 import FeasibilityPanel from './FeasibilityPanel';
 import RadiusPanel from './RadiusPanel';
+import PowerSupplyPanel from './PowerSupplyPanel';
 
 interface AnalysisSidebarProps {
   visibleLayers: { [key in InfrastructureType]?: boolean };
@@ -31,6 +32,10 @@ interface AnalysisSidebarProps {
   onRadiusOptimize: () => void;
   radiusResults: AnalysisResult[];
   radiusLoading: boolean;
+  // New props for power supply analysis
+  powerSupplyResult?: any;
+  isPowerSupplyLoading?: boolean;
+  onAnalyzePowerSupply: (requiredCapacity: number) => void;
 }
 
 const AnalysisSidebar: React.FC<AnalysisSidebarProps> = (props) => {
@@ -72,6 +77,13 @@ const AnalysisSidebar: React.FC<AnalysisSidebarProps> = (props) => {
             result={props.feasibilityResult}
             isLoading={props.isFeasibilityLoading || false}
             pinpoint={props.pinpoint}
+        />
+
+        <PowerSupplyPanel
+            pinpoint={props.pinpoint}
+            result={props.powerSupplyResult}
+            isLoading={props.isPowerSupplyLoading || false}
+            onAnalyzePowerSupply={props.onAnalyzePowerSupply}
         />
       </div>
     </aside>

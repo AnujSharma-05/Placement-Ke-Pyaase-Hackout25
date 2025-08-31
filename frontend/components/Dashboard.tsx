@@ -4,7 +4,7 @@ import Map from './Map';
 import { InfrastructureType, AnalysisResult } from '../types';
 import Navbar from './Navbar';
 import AnalysisSidebar from './AnalysisSidebar';
-import { getInitialMapData, optimizePoint, getReasoning, optimizeGrid, optimizeRadius } from '../src/services/api';
+import { getInitialMapData, optimizePoint, getReasoning, optimizeGrid, optimizeRadius, analyzePowerSupply } from '../src/services/api';
 
 interface DashboardProps {
   onLogout: () => void;
@@ -34,6 +34,10 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const [centerPoint, setCenterPoint] = useState<{ lat: number; lng: number } | null>(null);
   const [radiusResults, setRadiusResults] = useState<AnalysisResult[]>([]);
   const [radiusLoading, setRadiusLoading] = useState(false);
+
+  // For power supply analysis
+  const [powerSupplyResult, setPowerSupplyResult] = useState(null);
+  const [isPowerSupplyLoading, setIsPowerSupplyLoading] = useState(false);
 
   // Map state
   const [visibleLayers, setVisibleLayers] = useState<{ [key in InfrastructureType]?: boolean }>({
@@ -282,6 +286,35 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
     }
   }, [centerPoint, selectedRadius, sliderValues, getLocationName]);
   
+  const handleAnalyzePowerSupply = useCallback(async (requiredCapacity: number) => {
+    if (!pinpoint) {
+      console.error('No pinpoint selected for power supply analysis');
+      return;
+    }
+
+    setIsPowerSupplyLoading(true);
+    setError('');
+    setPowerSupplyResult(null);
+
+    try {
+      const coordinate = {
+        latitude: pinpoint.lat,
+        longitude: pinpoint.lng
+      };
+
+      const response = await analyzePowerSupply(coordinate, requiredCapacity);
+      
+      console.log('Power supply analysis response:', response);
+      setPowerSupplyResult(response);
+
+    } catch (err) {
+      setError('Failed to analyze power supply');
+      console.error('Power supply analysis error:', err);
+    } finally {
+      setIsPowerSupplyLoading(false);
+    }
+  }, [pinpoint]);
+  
   const handleResultClick = useCallback((coords: L.LatLngTuple) => {
     setPinpoint({ lat: coords[0], lng: coords[1] });
   }, []);
@@ -314,6 +347,9 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           onRadiusOptimize={handleRadiusOptimization}
           radiusResults={radiusResults}
           radiusLoading={radiusLoading}
+          powerSupplyResult={powerSupplyResult}
+          isPowerSupplyLoading={isPowerSupplyLoading}
+          onAnalyzePowerSupply={handleAnalyzePowerSupply}
         />
 
         {/* Center Map */}
