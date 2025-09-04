@@ -42,12 +42,12 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
           >
             About Us
           </button>
-          <button
+          {/* <button
             onClick={onLogout}
             className="bg-gray-700 hover:bg-red-600/50 text-white font-bold py-2 px-4 rounded-lg transition duration-300 text-sm"
           >
             Logout
-          </button>
+          </button> */}
         </div>
       </div>
     </nav>
