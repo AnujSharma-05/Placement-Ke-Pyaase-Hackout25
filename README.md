@@ -1,256 +1,135 @@
-# Green Hydrogen Project Feasibility Analyzer
+# Green Hydrogen Infrastructure Mapping and Optimization
 
-## Frontend UI Dashboard
+## 📸 Project Screenshots
 
-### Screenshot (Preview)
+### Landing Page
+![Landing Page](landing_page.jpg)
 
-![UI Dashboard](ui_dashboard.jpg)
+### Interactive Dashboard
+![Dashboard](dashboard.jpg)
 
-## Project Description
+## Description
+Identifying where to grow the hydrogen ecosystem requires a map-based tool that visualizes all existing/planned assets (plants, storage, pipelines, distribution hubs) and uses data-driven models to guide new investments. This project involves creating an interactive map layered with infrastructure data, renewable energy sources, demand centres, and transport logistics. The tool offers site selection recommendations for new projects based on criteria such as proximity to renewable generation, market demand, regulatory zones, or cost optimization.
 
-A comprehensive supply chain optimization and feasibility analysis system for green hydrogen project placement in India. This platform helps investors, policymakers, and energy companies identify optimal locations for green hydrogen production facilities by analyzing proximity to renewable energy sources, market demand centers, and logistics infrastructure.
+## Users
+- Urban and regional planners
+- Energy companies
+- Project developers
+- Policy analysts
 
-## Features and Functionality
+## Impact
+- Directs capital to high-impact, high-yield infrastructure projects.
+- Avoids redundant investment, minimizing costs and land use.
+- Facilitates coordinated growth of hydrogen networks supporting net zero ambitions.
 
-### Core Optimization Engine
+## Features
+- Interactive map visualization of existing and planned hydrogen infrastructure.
+- Layered data including renewable energy plants, demand centers, logistics hubs, and regulatory zones.
+- Data-driven site selection recommendations based on customizable criteria.
+- Real-time feasibility scoring for potential project sites.
+- AI-powered reasoning and insights to support decision making.
+- RESTful API endpoints for integration and extensibility.
 
-- **Grid-based Analysis**: Evaluates locations across India using a comprehensive grid system
-- **Multi-criteria Decision Making**: Considers power proximity, market access, and logistics infrastructure
-- **Weighted Scoring System**: Users can customize importance weights for different factors
-- **Real-time Feasibility Assessment**: Provides immediate scoring for any geographic coordinate
-
-### AI-Powered Insights
-
-- **Intelligent Reasoning**: AI agent explains feasibility scores in natural language
-- **Data-driven Recommendations**: Provides actionable insights based on optimization results
-- **Customizable Analysis**: Adapts explanations based on user priorities and weights
-
-### Interactive API
-
-- **RESTful Endpoints**: Comprehensive API for frontend integration
-- **GeoJSON Support**: Returns data in standardized geographic formats
-- **Error Handling**: Robust error management and validation
-
-## Technologies and Libraries Used
-
-### Backend Framework
-
-- **Flask**: Python web framework for API development
-- **Flask-CORS**: Cross-origin resource sharing support
-
-### Data Processing & Analysis
-
-- **Pandas**: Data manipulation and analysis
-- **NumPy**: Numerical computing and array operations
-- **Scikit-learn**: Machine learning utilities (Haversine distance calculations)
-
-### AI & Reasoning
-
-- **CrewAI**: Multi-agent framework for AI reasoning
-- **Google Gemini**: Large language model for natural language explanations
-
-### Optimization & Mathematics
-
-- **SciPy**: Scientific computing and optimization algorithms
-- **Linear Programming**: For supply route optimization
+## Technologies Used
+- Frontend: React, Leaflet.js, TailwindCSS, Framer Motion
+- Backend: Python, Flask, Pandas, NumPy, SciPy
+- AI & Optimization: CrewAI multi-agent framework, Google Gemini LLM, Linear Programming
+- Data Visualization: D3.js (optional)
+- GIS: PostGIS, Mapbox (optional)
 
 ## Project Structure
-
 ```
 Placement-Ke-Pyaase-Hackout25/
 ├── backend/
-│   ├── config.py              # Application configuration
-│   ├── requirements.txt       # Python dependencies
+│   ├── app/                  # Flask app and API routes
+│   ├── config.py             # Configuration
+│   ├── requirements.txt      # Python dependencies
 │   ├── run.py                # Application entry point
-│   ├── supply_chain_optimizer.py  # Core optimization engine
-│   ├── test_script.py        # Testing utilities
-│   └── app/
-│       ├── __init__.py       # Flask application factory
-│       ├── api/
-│       │   ├── __init__.py   # API blueprint
-│       │   └── routes.py     # API endpoint definitions
-│       ├── data/             # Data files directory
-│       │   ├── *.csv         # Various data sources
-│       │   └── app/data/     # Cleaned and processed data
-│       ├── services/
-│       │   ├── __init__.py
-│       │   ├── optimization_service.py  # Opportunity scoring service
-│       │   ├── reasoning_agent.py       # AI reasoning service
-│       │   └── api_test.py   # API testing utilities
-│       └── utils/
-│           ├── __init__.py
-│           └── data_loader.py # Data loading and preprocessing
+│   ├── supply_chain_optimizer.py  # Core optimization logic
+│   └── test_script.py        # Testing utilities
+├── frontend/
+│   ├── components/           # React components including landing pages and dashboard
+│   ├── data/                 # Frontend data files
+│   ├── src/                  # Frontend source code
+│   ├── package.json          # Node dependencies and scripts
+│   └── vite.config.ts        # Vite configuration
+└── README.md                 # This file
 ```
 
 ## Setup and Running Instructions
 
 ### Prerequisites
-
 - Python 3.8+
-- pip (Python package manager)
+- Node.js 16+
+- pip and npm package managers
 - Google Gemini API key (for AI reasoning)
 
-### Installation
-
-1. Clone the repository
-2. Navigate to the backend directory:
+### Backend Setup
+1. Clone the repository:
    ```bash
+   git clone https://github.com/your-repo/Placement-Ke-Pyaase-Hackout25.git
    cd Placement-Ke-Pyaase-Hackout25/backend
    ```
-3. Install dependencies:
+2. Create and activate a virtual environment:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # Windows: venv\Scripts\activate
+   ```
+3. Install Python dependencies:
    ```bash
    pip install -r requirements.txt
    ```
-4. Set up environment variables:
+4. Set environment variable for Gemini API key:
    ```bash
    export GEMINI_API_KEY=your_api_key_here
    ```
+5. Run the backend server:
+   ```bash
+   python run.py
+   ```
 
-### Running the Application
+### Frontend Setup
+1. Navigate to frontend directory:
+   ```bash
+   cd ../frontend
+   ```
+2. Install Node dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the frontend development server:
+   ```bash
+   npm run dev
+   ```
 
-```bash
-python run.py
-```
-
-The application will start on `http://0.0.0.0:5000`
-
-### Testing
-
-Run the test script to verify functionality:
-
-```bash
-python test_script.py
-```
-
-## Data Sources and Preprocessing
-
-### Primary Data Sources
-
-- **Renewable Energy Plants**: Solar and wind power installations across India
-- **Demand Centers**: Industrial and commercial zones with hydrogen demand potential
-- **Logistics Hubs**: Ports and transportation infrastructure
-- **SEZ Data**: Special Economic Zones for industrial development
-
-### Data Processing Pipeline
-
-1. **Data Cleaning**: Removal of incomplete records and standardization
-2. **Geocoding**: Conversion of location data to latitude/longitude coordinates
-3. **Capacity Normalization**: Standardization of power capacity measurements
-4. **Quality Assurance**: Validation of geographic coordinates and data integrity
-
-### Preprocessed Files
-
-- `cleaned_solar_plants.csv`: Processed solar power plant data
-- `cleaned_wind_plants.csv`: Processed wind power plant data
-- `cleaned_demand_centers.csv`: Processed demand center locations
-- `ports.csv`: Logistics hub information
+### Access the Application
+- Frontend UI: `http://localhost:5173`
+- Backend API: `http://localhost:5000`
 
 ## API Endpoints Summary
+- `POST /api/optimize`: Calculate opportunity scores with custom weights.
+- `GET /api/initial-map-data`: Retrieve all map data in GeoJSON format.
+- `POST /api/optimize-grid`: Grid-based optimization returning top locations.
+- `POST /api/optimize-point`: Feasibility score for a single coordinate.
+- `POST /api/analyze-reasoning`: AI-powered reasoning for scores.
+- `POST /api/optimize-radius`: Radius-based optimization for locations.
+- `POST /api/analyze-power-supply`: Power supply analysis with AI reasoning.
 
-### Optimization Endpoints
+## How to Use
+- Explore the interactive map with layered infrastructure data.
+- Adjust weights for power, market demand, and logistics to customize site scoring.
+- Click on map locations to get feasibility scores and AI-generated insights.
+- Use the API for integration with other tools or custom analysis.
 
-#### POST `/api/optimize`
-
-Calculates opportunity scores for new hydrogen projects with custom weights.
-
-**Request Body:**
-
-```json
-{
-  "powerWeight": 0.25,
-  "marketWeight": 0.25,
-  "opportunityWeight": 0.25,
-  "logisticsWeight": 0.25
-}
-```
-
-#### GET `/api/initial-map-data`
-
-Returns all initial data points for map visualization in GeoJSON format.
-
-#### POST `/api/optimize-grid`
-
-Grid-based optimization returning top N locations based on user weights.
-
-#### POST `/api/optimize-point`
-
-Calculates feasibility score for a single user-defined coordinate.
-
-#### POST `/api/analyze-reasoning`
-
-Generates AI-powered reasoning for feasibility scores.
-
-## AI-Powered Reasoning Agent
-
-### Features
-
-- **Contextual Analysis**: Explains scores based on user priorities
-- **Natural Language Output**: Provides human-readable explanations
-- **Data Integration**: Combines quantitative scores with qualitative insights
-- **Customizable**: Adapts to different weighting scenarios
-
-### Implementation
-
-- Built on CrewAI multi-agent framework
-- Integrated with Google Gemini for advanced reasoning
-- Provides 2-3 sentence explanations tailored to specific scores
-
-## Frontend UI Dashboard
-
-### Overview
-
-The frontend of the application is built with Next.js, React, and TailwindCSS, offering a clean and interactive interface for exploring green hydrogen infrastructure. The design emphasizes clarity, usability, and data-driven decision-making.
-
-### UI Layout
-
-The application is structured into three main panels:
-
-- **Left Sidebar – Data & Analysis**
-
-  - Data Layers Toggle: Users can switch infrastructure layers on/off, including Demand Centers, Logistics Hubs, Solar Plants, and Wind Farms.
-
-  - Analysis Parameters: Shows the currently selected site coordinates, along with adjustable sliders for Power, Market, and Logistics.
-
-  - Top Sites List: Displays ranked project sites with scores (e.g., Khavda Renewable Energy Park – 95/100), including Power, Market, and Logistics quality labels (Excellent/Good/Fair).
-
-- **Center – Interactive Map**
-
-  - Built with Leaflet.js + OpenStreetMap.
-
-  - Interactive markers for assets (demand hubs, logistics, SEZs, etc.).
-
-  - Clicking a site reveals popup details (e.g., Kandla SEZ export statistics across years).
-
-  - Supports zoom and pan for exploring different regions.
-
-- **Right Sidebar – Hydro (AI Assistant)**
-
-  - Hydro is the built-in AI assistant that helps analyze sites, policies, and investment opportunities.
-
-  - Currently includes an information panel (“Hydro will soon help you analyze sites and policies”) and a chat input box (Chat with Hydro – Coming Soon).
-
-- **Top Navigation Bar**
-
-  - Minimal navbar with Home, Analysis, About Us, Logout.
-
-  - Branding displayed as H₂OS (Hydrogen Operating System).
-
-### Tech Stack
-
-- Framework: Next.js + React
-
-- Styling: TailwindCSS
-
-- Maps: Leaflet.js + OpenStreetMap
-
-- State Management: React hooks (useState, useEffect, useMemo)
-
-- Icons & UI: Lucide-react + custom components
-
-## Team and Contribution
-
-This project was developed as part of Hackout25 hackathon by the "Placement Ke Pyaase" team, focusing on solving real-world energy infrastructure challenges through data-driven optimization and AI-powered insights.
+## Team
+Placement Ke Pyaase - Hackout25 Hackathon Participants
 
 ## License
-
 This project is developed for educational and research purposes as part of the Hackout25 hackathon.
+
+---
+
+**Note:**  
+Two placeholder images should be added to this README:
+- `landing_page.jpg` for the landing page screenshot.
+- `dashboard.jpg` for the interactive dashboard screenshot.
